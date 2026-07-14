@@ -1,0 +1,18 @@
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+aiosqlite==0.20.0
+sqlalchemy[asyncio]==2.0.30
+python-dotenv==1.0.1
+scikit-learn==1.5.0
+numpy==1.26.4
+scipy==1.13.1
+aiohttp==3.9.5
+httpx==0.27.0
+python-multipart==0.0.9
+pydantic==2.7.1
+cryptography==42.0.8
+# Post-Quantum Cryptography — install liboqs-python for real ML-KEM/ML-DSA
+# pip install oqs         (requires liboqs native library — preferred)
+# pip install pqcrypto    (pure-Python fallback)
+# The code gracefully falls back if neither is available.
+oqs; sys_platform != "unsupported"
