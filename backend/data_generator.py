@@ -381,8 +381,31 @@ class SyntheticDataGenerator:
 
     def _build_normal_event(self) -> Dict:
         identity = random.choice(self.identities)
-        pg = identity["peer_group"]
-        cfg = PEER_GROUPS[pg]
+        pg = identity.get("peer_group", "UNKNOWN")
+        
+        # Fallback for CERT dataset roles
+        if pg in PEER_GROUPS:
+            cfg = PEER_GROUPS[pg]
+        else:
+            allowed = identity.get("allowed_systems")
+            if isinstance(allowed, str):
+                try:
+                    sys_list = json.loads(allowed)
+                except:
+                    sys_list = ["PC-0000"]
+            else:
+                sys_list = allowed or ["PC-0000"]
+                
+            cfg = {
+                "session_duration_mean": 45.0,
+                "session_duration_std": 15.0,
+                "data_volume_mean": 20.0,
+                "data_volume_std": 10.0,
+                "typical_systems": sys_list if sys_list else ["PC-0000"],
+                "normal_sequences": [["LOGIN", "FILE_ACCESS", "FILE_ACCESS", "LOGOUT"]],
+                "privilege_level": "LOW",
+            }
+
         now = datetime.datetime.utcnow()
         login_hour = now.hour
         duration = _jitter(cfg["session_duration_mean"], cfg["session_duration_std"], 5, 300)
@@ -395,7 +418,7 @@ class SyntheticDataGenerator:
             "identity_id": identity["id"],
             "identity_name": identity["name"],
             "peer_group": pg,
-            "identity_type": identity["identity_type"],
+            "identity_type": identity.get("identity_type", "employee"),
             "start_time": now.isoformat(),
             "target_system": target,
             "privilege_level": cfg["privilege_level"],
@@ -410,10 +433,9 @@ class SyntheticDataGenerator:
 
     def _inject_anomaly_event(self) -> Dict:
         scenario = random.choice(ANOMALY_SCENARIOS)
-        pg = scenario["peer_group"]
-
-        # Pick a random identity from that peer group
-        candidates = [i for i in self.identities if i["peer_group"] == pg]
+        
+        # In CERT data, we might not have the specific peer_group. Just pick any.
+        candidates = [i for i in self.identities if i.get("peer_group") == scenario["peer_group"]]
         identity = random.choice(candidates) if candidates else random.choice(self.identities)
 
         now = datetime.datetime.utcnow()
@@ -423,11 +445,11 @@ class SyntheticDataGenerator:
             "session_id": f"sess_{uuid.uuid4().hex[:12]}",
             "identity_id": identity["id"],
             "identity_name": identity["name"],
-            "peer_group": identity["peer_group"],
-            "identity_type": identity["identity_type"],
+            "peer_group": identity.get("peer_group", "UNKNOWN"),
+            "identity_type": identity.get("identity_type", "employee"),
             "start_time": session_dt.isoformat(),
             "target_system": scenario["target_system"],
-            "privilege_level": PEER_GROUPS[identity["peer_group"]]["privilege_level"],
+            "privilege_level": "HIGH" if "ADMIN" in identity.get("peer_group", "").upper() else "LOW",
             "source_ip": _random_ip(),
             "actions": json.dumps(scenario["actions"]),
             "data_volume_mb": scenario["data_volume_mb"],

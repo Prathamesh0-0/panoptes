@@ -322,6 +322,21 @@ async def _process_session(raw: dict):
 async def _live_stream_processor():
     """Continuously generates and processes live events for the demo."""
     await asyncio.sleep(3)  # Give startup time to complete
+    
+    # Ensure generator has identities from the database
+    async with AsyncSessionLocal() as db:
+        id_result = await db.execute(select(Identity))
+        generator.identities = [
+            {
+                "id": i.id,
+                "name": i.name,
+                "peer_group": i.peer_group,
+                "identity_type": i.identity_type,
+                "allowed_systems": i.allowed_systems,
+            }
+            for i in id_result.scalars().all()
+        ]
+        
     logger.info("Live stream processor started. Injecting events every %.0fs (anomaly rate: %.0f%%)",
                 STREAM_INTERVAL, ANOMALY_RATE * 100)
     while True:
@@ -378,6 +393,9 @@ app.include_router(audit.router)
 app.include_router(pqc.router)
 app.include_router(stream.router)
 app.include_router(ingest.router)
+
+from backend.routers import policy_editor
+app.include_router(policy_editor.router)
 
 
 @app.get("/api/health")

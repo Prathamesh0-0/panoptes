@@ -7,13 +7,17 @@ import PolicyLog from './pages/PolicyLog'
 import PQCStatus from './pages/PQCStatus'
 import Identities from './pages/Identities'
 import DataSources from './pages/DataSources'
+import AlertInbox from './pages/AlertInbox'
+import PolicyEditor from './pages/PolicyEditor'
 import { api } from './api'
 
 const PAGE_TITLES = {
   '/':             { title: 'Risk Dashboard',      sub: 'Live session monitoring and threat detection' },
+  '/alerts':       { title: 'SOC Inbox',           sub: 'Incident response and alert triage' },
   '/policy-log':   { title: 'Policy Decisions',    sub: 'OPA Rego access control verdicts' },
+  '/policy-editor':{ title: 'Policy Editor',       sub: 'Dynamic rule configuration' },
   '/pqc':          { title: 'PQC Vault',            sub: 'Post-quantum cryptography and audit signing' },
-  '/identities':   { title: 'Identity Registry',   sub: '50 identities across 5 peer groups' },
+  '/identities':   { title: 'Identity Registry',   sub: 'Identities across peer groups' },
   '/ingest':       { title: 'Data Sources',         sub: 'Real-world log ingestion and integration' },
 }
 
@@ -114,7 +118,9 @@ function AppInner() {
         <Routes>
           <Route path="/"               element={<Dashboard liveEvents={liveEvents} />} />
           <Route path="/sessions/:id"   element={<SessionDetail />} />
+          <Route path="/alerts"         element={<AlertInbox />} />
           <Route path="/policy-log"     element={<PolicyLog />} />
+          <Route path="/policy-editor"  element={<PolicyEditor />} />
           <Route path="/pqc"            element={<PQCStatus />} />
           <Route path="/identities"     element={<Identities />} />
           <Route path="/ingest"         element={<DataSources />} />

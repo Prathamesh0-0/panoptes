@@ -2,7 +2,9 @@ import { NavLink } from 'react-router-dom'
 
 const NAV = [
   { to: '/', label: 'Risk Dashboard', icon: IconDashboard, end: true },
+  { to: '/alerts', label: 'SOC Inbox', icon: IconAlerts },
   { to: '/policy-log', label: 'Policy Decisions', icon: IconPolicy },
+  { to: '/policy-editor', label: 'Policy Editor', icon: IconCode },
   { to: '/identities', label: 'Identity Registry', icon: IconUsers },
   { to: '/pqc', label: 'PQC Vault', icon: IconShield },
   { to: '/ingest', label: 'Data Sources', icon: IconIngest },
@@ -125,6 +127,21 @@ function IconIngest({ className }) {
     <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
       <path d="M8 1v10M5 8l3 3 3-3"/>
       <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
+    </svg>
+  )
+}
+function IconAlerts({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 1c-2.5 0-4 1.5-4 4v3l-2 3h12l-2-3V5c0-2.5-1.5-4-4-4z"/>
+      <path d="M6 12a2 2 0 004 0"/>
+    </svg>
+  )
+}
+function IconCode({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2L7 14"/>
     </svg>
   )
 }

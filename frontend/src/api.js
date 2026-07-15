@@ -27,13 +27,24 @@ async function patch(path, body) {
   return res.json()
 }
 
+async function put(path, body) {
+  const res = await fetch(`${BASE}${path}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  if (!res.ok) throw new Error(`API error ${res.status}: ${path}`)
+  return res.json()
+}
+
 export const api = {
   // Health
   health: () => get('/health'),
 
   // Sessions
   sessions: (params = {}) => {
-    const q = new URLSearchParams(params).toString()
+    const cleanParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined))
+    const q = new URLSearchParams(cleanParams).toString()
     return get(`/sessions${q ? '?' + q : ''}`)
   },
   sessionStats: () => get('/sessions/stats'),
@@ -41,7 +52,8 @@ export const api = {
 
   // Alerts
   alerts: (params = {}) => {
-    const q = new URLSearchParams(params).toString()
+    const cleanParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined))
+    const q = new URLSearchParams(cleanParams).toString()
     return get(`/alerts${q ? '?' + q : ''}`)
   },
   resolveAlert: (id) => patch(`/alerts/${id}/status?status=RESOLVED`),
@@ -64,6 +76,10 @@ export const api = {
   vaultList: () => get('/pqc/vault'),
   pqcSign: (message) => post('/pqc/sign', { message }),
   pqcVerify: (entry) => post('/pqc/verify', { entry }),
+
+  // Policy Editor
+  policyGet: () => get('/policy'),
+  policyUpdate: (rego_content) => put('/policy', { rego_content }),
 }
 
 export function scoreColor(score) {
