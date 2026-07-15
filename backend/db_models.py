@@ -106,8 +106,9 @@ class AuditLog(Base):
     identity_id: Mapped[str] = mapped_column(String(64), default="")
     action_taken: Mapped[str] = mapped_column(String(32))
     details: Mapped[str] = mapped_column(Text)  # JSON
-    signature: Mapped[str] = mapped_column(Text, default="")     # hex-encoded Dilithium sig
+    signature: Mapped[str] = mapped_column(Text, default="")     # hex-encoded digital signature
     public_key: Mapped[str] = mapped_column(Text, default="")    # hex-encoded public key
+    content_hash: Mapped[str] = mapped_column(String(64), default="")  # SHA-256 of canonical entry
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     tampered: Mapped[bool] = mapped_column(Boolean, default=False)
     timestamp: Mapped[datetime.datetime] = mapped_column(DateTime, default=_now)

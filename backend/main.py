@@ -17,13 +17,13 @@ from sqlalchemy import select, update
 
 from backend.database import init_db, AsyncSessionLocal
 from backend.db_models import Identity, Session as SessionModel, Alert, AuditLog
-from backend.data_generator import generator, PEER_GROUPS, ASSET_CRITICALITY, ACTION_SENSITIVITY
+from backend.data_generator import generator, PEER_GROUPS
 from backend.models.peer_group_model import peer_group_model
 from backend.models.sequence_model import sequence_model
-from backend.models import risk_fusion
+from backend.models.risk_fusion import fuse as risk_fuse, ASSET_CRITICALITY, ACTION_SENSITIVITY
 from backend.policy import engine as policy_engine
 from backend.crypto.audit_signer import sign_entry
-from backend.routers import sessions, alerts, identities, audit, pqc, stream
+from backend.routers import sessions, alerts, identities, audit, pqc, stream, ingest
 
 logging.basicConfig(
     level=logging.INFO,
@@ -181,7 +181,8 @@ async def _process_session(raw: dict):
     } if identity_obj else {"id": identity_id, "identity_type": "employee", "peer_group": peer_group, "allowed_systems": "[]"}
 
     # 4. Risk fusion
-    fusion = risk_fusion.fuse(
+    login_hour = raw.get("login_hour", 9)
+    fusion = risk_fuse(
         behavioral_score=behavioral_score,
         sequence_score=sequence_score,
         target_system=target_system,
@@ -190,12 +191,13 @@ async def _process_session(raw: dict):
         identity=identity_dict,
         behavioral_deviations=behav_result.get("deviations", {}),
         sequence_result=seq_result,
+        anomaly_type=raw.get("anomaly_type", ""),
+        login_hour=int(login_hour),
     )
     risk_score = fusion["risk_score"]
     risk_label = fusion["risk_label"]
 
     # 5. OPA policy decision
-    login_hour = raw.get("login_hour", 9)
     is_after_hours = login_hour < 7 or login_hour > 20
     opa_input = {
         "risk_score": risk_score,
@@ -262,6 +264,7 @@ async def _process_session(raw: dict):
         details=audit_entry["details"],
         signature=signed["signature"],
         public_key=signed["public_key"],
+        content_hash=signed["content_hash"],
         verified=True,
     )
 
@@ -374,6 +377,7 @@ app.include_router(identities.router)
 app.include_router(audit.router)
 app.include_router(pqc.router)
 app.include_router(stream.router)
+app.include_router(ingest.router)
 
 
 @app.get("/api/health")

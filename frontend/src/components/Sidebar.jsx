@@ -1,10 +1,11 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
-const NAV_ITEMS = [
+const NAV = [
   { to: '/', label: 'Risk Dashboard', icon: IconDashboard, end: true },
-  { to: '/policy-log', label: 'Policy Log', icon: IconPolicy },
-  { to: '/pqc', label: 'PQC Status', icon: IconShield },
-  { to: '/identities', label: 'Identities', icon: IconUsers },
+  { to: '/policy-log', label: 'Policy Decisions', icon: IconPolicy },
+  { to: '/identities', label: 'Identity Registry', icon: IconUsers },
+  { to: '/pqc', label: 'PQC Vault', icon: IconShield },
+  { to: '/ingest', label: 'Data Sources', icon: IconIngest },
 ]
 
 export default function Sidebar({ stats, opaRunning }) {
@@ -12,14 +13,21 @@ export default function Sidebar({ stats, opaRunning }) {
 
   return (
     <aside className="sidebar">
+      {/* Brand */}
       <div className="sidebar-brand">
-        <div className="sidebar-brand-name">PANOPTES</div>
+        <div className="sidebar-brand-mark">
+          <div className="sidebar-brand-icon">
+            <IconPanoptes />
+          </div>
+          <span className="sidebar-brand-name">PANOPTES</span>
+        </div>
         <div className="sidebar-brand-sub">Insider Threat Detection</div>
       </div>
 
+      {/* Navigation */}
       <nav className="sidebar-nav">
         <div className="nav-section-label">Monitoring</div>
-        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+        {NAV.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -35,56 +43,88 @@ export default function Sidebar({ stats, opaRunning }) {
         ))}
       </nav>
 
+      {/* System Status */}
       <div className="sidebar-footer">
-        <div className="nav-section-label" style={{ padding: '0 0 6px' }}>System Status</div>
-        <div className="sidebar-status-row">
-          <span className="status-dot green" />
-          <span>Stream Processor</span>
-        </div>
-        <div className="sidebar-status-row">
-          <span className={`status-dot ${opaRunning ? 'green' : 'yellow'}`} />
-          <span>OPA {opaRunning ? '(Rego)' : '(Inline)'}</span>
-        </div>
-        <div className="sidebar-status-row">
-          <span className="status-dot green" />
-          <span>PQC Vault Active</span>
-        </div>
-        <div className="sidebar-status-row" style={{ marginTop: 8 }}>
-          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-            Bank of Maharashtra — PS1
-          </span>
+        <div className="nav-section-label" style={{ padding: '0 0 8px' }}>System Status</div>
+        <StatusRow label="Stream Processor" ok={true} />
+        <StatusRow label={`OPA ${opaRunning ? '(Real Rego)' : '(Inline Fallback)'}`} ok={opaRunning} warn={!opaRunning} />
+        <StatusRow label="PQC Vault" ok={true} />
+        <StatusRow label="ML Models" ok={true} />
+        <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.28)', lineHeight: 1.5 }}>
+          Bank of Maharashtra<br />
+          PS1 — Privileged Access Misuse
         </div>
       </div>
     </aside>
   )
 }
 
-/* ─── Inline SVG Icons ───────────────────────────────────────────────────── */
+function StatusRow({ label, ok, warn }) {
+  const dotClass = warn ? 'yellow' : ok ? 'green' : 'red'
+  return (
+    <div className="sidebar-status-row">
+      <span className={`status-dot ${dotClass}`} />
+      <span>{label}</span>
+    </div>
+  )
+}
+
+/* ─── SVG Icons ─────────────────────────────────────────────────────────── */
+function IconPanoptes() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" fill="none"/>
+      <circle cx="8" cy="8" r="2.5" fill="rgba(255,255,255,0.8)"/>
+      <line x1="8" y1="2" x2="8" y2="4" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="8" y1="12" x2="8" y2="14" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="2" y1="8" x2="4" y2="8" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="12" y1="8" x2="14" y2="8" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  )
+}
 function IconDashboard({ className }) {
   return (
-    <svg className={className} viewBox="0 0 16 16" fill="currentColor">
-      <path d="M2 2h5v5H2V2zm0 7h5v5H2V9zm7-7h5v5H9V2zm0 7h5v5H9V9z" />
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1" y="1" width="6" height="6" rx="1"/>
+      <rect x="9" y="1" width="6" height="6" rx="1"/>
+      <rect x="1" y="9" width="6" height="6" rx="1"/>
+      <rect x="9" y="9" width="6" height="6" rx="1"/>
     </svg>
   )
 }
 function IconPolicy({ className }) {
   return (
-    <svg className={className} viewBox="0 0 16 16" fill="currentColor">
-      <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm9 3H7V7h2v4zm0-5H7V4h2v2z" />
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 1L14 4v5c0 3-2.5 5-6 6C2.5 14 1 12 1 9V4l7-3z"/>
+      <path d="M5.5 8l1.8 1.8L10.5 6"/>
     </svg>
   )
 }
 function IconShield({ className }) {
   return (
-    <svg className={className} viewBox="0 0 16 16" fill="currentColor">
-      <path d="M8 0a.5.5 0 0 1 .217.049l7 3A.5.5 0 0 1 15.5 3.5v5c0 2.9-1.663 5.097-3.653 6.527A13.5 13.5 0 0 1 8 16a13.5 13.5 0 0 1-3.847-1.527C2.163 13.097.5 10.9.5 8.5v-5a.5.5 0 0 1 .283-.451l7-3A.5.5 0 0 1 8 0zm0 1.065-6.5 2.785V8.5c0 2.296 1.337 4.2 3.097 5.465A12.5 12.5 0 0 0 8 14.93a12.5 12.5 0 0 0 2.403-1.465C12.163 12.7 13.5 10.796 13.5 8.5V3.85L8 1.065z" />
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="5" height="8" rx="1"/>
+      <rect x="9" y="4" width="5" height="8" rx="1"/>
+      <path d="M7 8h2"/>
+      <path d="M2 8h13"/>
     </svg>
   )
 }
 function IconUsers({ className }) {
   return (
-    <svg className={className} viewBox="0 0 16 16" fill="currentColor">
-      <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="6" cy="5" r="2.5"/>
+      <path d="M1 14c0-2.5 2-4 5-4s5 1.5 5 4"/>
+      <circle cx="12" cy="5" r="2"/>
+      <path d="M12 9c1.5 0 3 1 3 3"/>
+    </svg>
+  )
+}
+function IconIngest({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 1v10M5 8l3 3 3-3"/>
+      <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
     </svg>
   )
 }
