@@ -81,6 +81,7 @@ access_decision := {
     input.asset_criticality >= 0.9
     input.identity_type in ["contractor", "branch_staff"]
     input.risk_score >= 60
+    input.risk_score < 80
 }
 
 # ─── PRIVILEGE ESCALATION DETECTION ──────────────────────────────────────────
@@ -95,6 +96,8 @@ access_decision := {
     "ESCALATE" in input.actions
     "LATERAL" in input.actions
     input.risk_score >= 70
+    input.risk_score < 80
+    not (input.is_after_hours == true and input.asset_criticality >= 0.9 and input.identity_type in ["contractor", "branch_staff"])
 }
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────

@@ -81,6 +81,10 @@ async def run():
         cfg = PEER_GROUPS[pg]
         name = generator._next_name()
         
+        allowed_sys = set(target_systems)
+        for sys in cfg.get("typical_systems", []):
+            allowed_sys.add(sys)
+        
         id_obj = {
             "id": f"id_{user}",
             "name": name,
@@ -88,7 +92,7 @@ async def run():
             "department": cfg["dept"],
             "peer_group": pg,
             "identity_type": cfg["identity_type"],
-            "allowed_systems": json.dumps(list(target_systems)),
+            "allowed_systems": json.dumps(list(allowed_sys)),
         }
         cert_identities.append(id_obj)
         user_to_identity_map[user] = id_obj

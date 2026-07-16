@@ -22,7 +22,7 @@ async def list_sessions(
     db: AsyncSession = Depends(get_db),
 ):
     offset = (page - 1) * per_page
-    stmt = select(SessionModel).order_by(desc(SessionModel.risk_score))
+    stmt = select(SessionModel).order_by(desc(SessionModel.start_time))
 
     if risk_label:
         stmt = stmt.where(SessionModel.risk_label == risk_label.upper())
