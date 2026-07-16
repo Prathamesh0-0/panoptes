@@ -32,7 +32,7 @@ async def run():
     
     # We will read files and aggregate by (user, pc, date)
     sessions_map = defaultdict(list)
-    identities_map = {} # user -> identity object
+    identities_map = defaultdict(set) # user -> set of target systems
 
     logger.info("Reading logon.csv...")
     logon_file = os.path.join(ds_dir, "logon.csv")
@@ -43,7 +43,7 @@ async def run():
                 dt = parse_date(row['date'])
                 if dt:
                     sessions_map[(row['user'], row['pc'], dt.date())].append((dt, row['activity']))
-                    identities_map[row['user']] = {"target": row['pc']}
+                    identities_map[row['user']].add(row['pc'])
 
     logger.info("Reading device.csv...")
     device_file = os.path.join(ds_dir, "device.csv")
@@ -54,6 +54,7 @@ async def run():
                 dt = parse_date(row['date'])
                 if dt:
                     sessions_map[(row['user'], row['pc'], dt.date())].append((dt, row['activity']))
+                    identities_map[row['user']].add(row['pc'])
 
     logger.info("Reading file.csv...")
     file_file = os.path.join(ds_dir, "file.csv")
@@ -64,6 +65,7 @@ async def run():
                 dt = parse_date(row['date'])
                 if dt:
                     sessions_map[(row['user'], row['pc'], dt.date())].append((dt, "File Access"))
+                    identities_map[row['user']].add(row['pc'])
 
     logger.info(f"Aggregated {len(sessions_map)} unique user-day sessions from CERT datasets.")
 
@@ -74,7 +76,7 @@ async def run():
     cert_identities = []
     user_to_identity_map = {}
     
-    for user, info in identities_map.items():
+    for user, target_systems in identities_map.items():
         pg = random.choice(list(PEER_GROUPS.keys()))
         cfg = PEER_GROUPS[pg]
         name = generator._next_name()
@@ -86,7 +88,7 @@ async def run():
             "department": cfg["dept"],
             "peer_group": pg,
             "identity_type": cfg["identity_type"],
-            "allowed_systems": json.dumps([info["target"]]),
+            "allowed_systems": json.dumps(list(target_systems)),
         }
         cert_identities.append(id_obj)
         user_to_identity_map[user] = id_obj
