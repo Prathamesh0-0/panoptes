@@ -43,9 +43,9 @@ function TopBar({ location, stats }) {
         )}
       </div>
       <div className="topbar-right">
-        {stats?.critical > 0 && (
+        {stats?.active_alerts > 0 && (
           <span className="badge badge-critical" style={{ fontSize: 11 }}>
-            {stats.critical} Critical Active
+            {stats.active_alerts} Active Alerts
           </span>
         )}
         <span className="topbar-time">

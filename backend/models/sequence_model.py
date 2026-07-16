@@ -51,6 +51,9 @@ class MarkovSequenceModel:
                 if not actions:
                     continue
 
+                for a in actions:
+                    self._all_actions.add(a)
+
                 start_counts[peer_group][actions[0]] += 1
 
                 for i in range(len(actions) - 1):

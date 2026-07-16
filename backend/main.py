@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func
 
 from backend.database import init_db, AsyncSessionLocal
 from backend.db_models import Identity, Session as SessionModel, Alert, AuditLog
@@ -320,30 +320,44 @@ async def _process_session(raw: dict):
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def _live_stream_processor():
-    """Continuously generates and processes live events for the demo."""
+    """Continuously fetches random historical CERT events and processes them as live events."""
     await asyncio.sleep(3)  # Give startup time to complete
     
-    # Ensure generator has identities from the database
-    async with AsyncSessionLocal() as db:
-        id_result = await db.execute(select(Identity))
-        generator.identities = [
-            {
-                "id": i.id,
-                "name": i.name,
-                "peer_group": i.peer_group,
-                "identity_type": i.identity_type,
-                "allowed_systems": i.allowed_systems,
-            }
-            for i in id_result.scalars().all()
-        ]
-        
-    logger.info("Live stream processor started. Injecting events every %.0fs (anomaly rate: %.0f%%)",
+    logger.info("Live stream processor started. Replaying CERT events every %.0fs (anomaly rate: %.0f%%)",
                 STREAM_INTERVAL, ANOMALY_RATE * 100)
     while True:
         try:
             inject = random.random() < ANOMALY_RATE
-            raw = generator.build_live_event(inject_anomaly=inject)
-            await _process_session(raw)
+            
+            async with AsyncSessionLocal() as db:
+                # Pick a random session from the dataset
+                stmt = select(SessionModel).where(SessionModel.is_anomalous == inject).order_by(func.random()).limit(1)
+                result = await db.execute(stmt)
+                db_session = result.scalar_one_or_none()
+                
+                if db_session:
+                    # Replay it as a live event
+                    raw = {
+                        "session_id": f"sess_{uuid.uuid4().hex[:12]}",
+                        "identity_id": db_session.identity_id,
+                        "identity_name": db_session.identity_name,
+                        "peer_group": db_session.peer_group,
+                        "identity_type": db_session.identity_type,
+                        "start_time": datetime.datetime.utcnow().isoformat(),
+                        "target_system": db_session.target_system,
+                        "privilege_level": db_session.privilege_level,
+                        "source_ip": db_session.source_ip,
+                        "actions": db_session.actions, # Already JSON string
+                        "data_volume_mb": db_session.data_volume_mb,
+                        "login_hour": datetime.datetime.utcnow().hour,
+                        "duration_minutes": db_session.duration_minutes,
+                        "is_anomalous": inject,
+                        "anomaly_type": db_session.anomaly_type if inject else "",
+                    }
+                    # We need to parse actions back to list because _process_session expects it
+                    raw["actions"] = json.dumps(db_session.actions_list())
+                    await _process_session(raw)
+                
         except Exception as e:
             logger.error("Stream processor error: %s", e, exc_info=True)
         await asyncio.sleep(STREAM_INTERVAL)

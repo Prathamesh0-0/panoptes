@@ -50,11 +50,13 @@ async def list_sessions(
 @router.get("/stats")
 async def get_stats(db: AsyncSession = Depends(get_db)):
     """Dashboard summary statistics."""
+    from backend.db_models import Alert
+    
     total_q = await db.execute(select(func.count()).select_from(SessionModel))
     total = total_q.scalar() or 0
 
-    for label in ("CRITICAL", "HIGH", "MEDIUM", "LOW"):
-        pass
+    active_alerts_q = await db.execute(select(func.count()).select_from(Alert).where(Alert.status == 'ACTIVE'))
+    active_alerts = active_alerts_q.scalar() or 0
 
     async def count_label(lbl):
         q = await db.execute(
@@ -65,6 +67,7 @@ async def get_stats(db: AsyncSession = Depends(get_db)):
     critical = await count_label("CRITICAL")
     high = await count_label("HIGH")
     medium = await count_label("MEDIUM")
+    low = await count_label("LOW")
 
     blocked_q = await db.execute(
         select(func.count()).select_from(SessionModel)
@@ -92,6 +95,7 @@ async def get_stats(db: AsyncSession = Depends(get_db)):
         "blocked": blocked,
         "mfa_challenges": mfa_challenges,
         "anomalous_detected": anomalous,
+        "active_alerts": active_alerts,
     }
 
 

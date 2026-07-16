@@ -119,24 +119,24 @@ PEER_GROUPS = {
     },
 }
 
-INDIAN_FIRST_NAMES = [
-    "Arjun", "Priya", "Rahul", "Ananya", "Vikram", "Deepa", "Suresh", "Kavita",
-    "Amit", "Pooja", "Rajesh", "Sunita", "Nikhil", "Meera", "Sanjay", "Rekha",
-    "Aakash", "Divya", "Pranav", "Sneha", "Kiran", "Nisha", "Rohan", "Anjali",
-    "Mohit", "Geeta", "Vishal", "Shreya", "Anil", "Preeti", "Tarun", "Ritu",
-    "Harsh", "Bhavna", "Yash", "Alka", "Dev", "Shweta", "Manu", "Varsha",
-    "Sandeep", "Usha", "Gaurav", "Seema", "Akash", "Rani", "Pankaj", "Lata",
-    "Dinesh", "Hema",
+GENERIC_FIRST_NAMES = [
+    "James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda",
+    "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica",
+    "Thomas", "Sarah", "Christopher", "Karen", "Charles", "Lisa", "Daniel", "Nancy",
+    "Matthew", "Betty", "Anthony", "Sandra", "Mark", "Margaret", "Donald", "Ashley",
+    "Steven", "Kimberly", "Andrew", "Emily", "Paul", "Donna", "Joshua", "Michelle",
+    "Kenneth", "Carol", "Kevin", "Amanda", "Brian", "Melissa", "George", "Deborah",
+    "Edward", "Stephanie",
 ]
 
-INDIAN_LAST_NAMES = [
-    "Sharma", "Patel", "Singh", "Kumar", "Joshi", "Gupta", "Mehta", "Verma",
-    "Rao", "Nair", "Iyer", "Desai", "Chaudhary", "Pandey", "Shukla", "Mishra",
-    "Kulkarni", "Patil", "More", "Jadhav", "Sawant", "Kadam", "Pawar", "Mane",
-    "Gaikwad", "Kale", "Subramaniam", "Krishnan", "Pillai", "Menon", "Reddy",
-    "Naidu", "Yadav", "Tiwari", "Dwivedi", "Tripathi", "Bhat", "Hegde",
-    "Anand", "Saxena", "Aggarwal", "Bansal", "Goel", "Arora", "Batra",
-    "Khanna", "Malhotra", "Chopra", "Sethi", "Kapoor",
+GENERIC_LAST_NAMES = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+    "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzales", "Wilson", "Anderson",
+    "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
+    "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+    "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill",
+    "Flores", "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell",
+    "Mitchell", "Carter", "Roberts",
 ]
 
 ASSET_CRITICALITY = {
@@ -273,8 +273,8 @@ class SyntheticDataGenerator:
 
     def __init__(self):
         self._name_pool = list(zip(
-            random.sample(INDIAN_FIRST_NAMES, len(INDIAN_FIRST_NAMES)),
-            random.sample(INDIAN_LAST_NAMES, len(INDIAN_LAST_NAMES)),
+            random.sample(GENERIC_FIRST_NAMES, len(GENERIC_FIRST_NAMES)),
+            random.sample(GENERIC_LAST_NAMES, len(GENERIC_LAST_NAMES)),
         ))
         self._name_idx = 0
         self.identities: List[Dict] = []

@@ -11,7 +11,7 @@ const NAV = [
 ]
 
 export default function Sidebar({ stats, opaRunning }) {
-  const criticalCount = stats?.critical || 0
+  const activeCount = stats?.active_alerts || 0
 
   return (
     <aside className="sidebar">
@@ -38,8 +38,8 @@ export default function Sidebar({ stats, opaRunning }) {
           >
             <Icon className="nav-icon" />
             {label}
-            {label === 'Risk Dashboard' && criticalCount > 0 && (
-              <span className="nav-badge">{criticalCount}</span>
+            {label === 'SOC Inbox' && activeCount > 0 && (
+              <span className="nav-badge">{activeCount}</span>
             )}
           </NavLink>
         ))}
