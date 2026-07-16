@@ -397,7 +397,6 @@ app.include_router(ingest.router)
 from backend.routers import policy_editor
 app.include_router(policy_editor.router)
 
-
 @app.get("/api/health")
 async def health():
     return {
@@ -405,6 +404,25 @@ async def health():
         "opa_running": policy_engine.is_opa_running(),
         "models_trained": peer_group_model._trained and sequence_model._trained,
     }
+
+# Serve React Frontend
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+frontend_dist = os.path.join(os.path.dirname(__file__), "../frontend/dist")
+if os.path.exists(frontend_dist):
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+    
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # Fallback to index.html for React Router
+        if full_path.startswith("api/") or full_path.startswith("ws/"):
+            return {"error": "Not found"}
+        file_path = os.path.join(frontend_dist, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
 
 
 if __name__ == "__main__":

@@ -88,7 +88,8 @@ function AppInner() {
 
   const connectWs = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return
-    const ws = new WebSocket(`ws://${window.location.hostname}:8000/ws/live`)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.host}/ws/live`)
     wsRef.current = ws
     ws.onmessage = (e) => {
       try {
