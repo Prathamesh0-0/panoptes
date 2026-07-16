@@ -7,7 +7,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: Build the FastAPI Backend
-FROM python:3.11-slim
+FROM python:3.12-slim
 WORKDIR /app
 
 # Install wget to download OPA
