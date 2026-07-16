@@ -44,8 +44,8 @@ export default function PolicyEditor() {
     <div style={{ maxWidth: 1200, margin: '0 auto', paddingBottom: 40, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 600, color: '#F9FAFB' }}>Dynamic Policy Editor</h1>
-          <p style={{ color: '#9CA3AF' }}>Edit OPA Rego rules and hot-reload the policy engine in real-time.</p>
+          <h1 style={{ fontSize: 24, fontWeight: 600, color: 'var(--text-primary)' }}>Dynamic Policy Editor</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Edit OPA Rego rules and hot-reload the policy engine in real-time.</p>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           {message && (

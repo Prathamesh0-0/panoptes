@@ -34,8 +34,8 @@ export default function AlertInbox() {
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', paddingBottom: 40 }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 600, color: '#F9FAFB' }}>SOC Incident Inbox</h1>
-        <p style={{ color: '#9CA3AF' }}>Triage and investigate active behavioral anomalies flagged by AI.</p>
+        <h1 style={{ fontSize: 24, fontWeight: 600, color: 'var(--text-primary)' }}>SOC Incident Inbox</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>Triage and investigate active behavioral anomalies flagged by AI.</p>
       </div>
 
       <div className="panel">
@@ -75,14 +75,14 @@ export default function AlertInbox() {
                 
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 16, fontWeight: 500, color: '#F9FAFB' }}>{a.identity_name}</span>
+                    <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-primary)' }}>{a.identity_name}</span>
                     <span className="tag" style={{ background: '#374151' }}>{a.peer_group}</span>
-                    <span style={{ fontSize: 13, color: '#9CA3AF' }}>{formatDateTime(a.created_at)}</span>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{formatDateTime(a.created_at)}</span>
                   </div>
-                  <div style={{ color: '#D1D5DB', fontSize: 14, marginBottom: 8, lineHeight: 1.5 }}>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 8, lineHeight: 1.5 }}>
                     {a.explanation_summary}
                   </div>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#9CA3AF' }}>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 13, color: 'var(--text-muted)' }}>
                     <span>Action Taken: <span style={{ color: '#EF4444' }}>{a.policy_action}</span></span>
                     <span>Risk Score: <span style={{ color: scoreColor(a.risk_score) }}>{a.risk_score}</span></span>
                     <span>Type: {a.anomaly_type.replace(/_/g, ' ')}</span>
