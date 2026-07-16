@@ -160,6 +160,28 @@ async def run():
         )
         db_sessions.append(s)
 
+    logger.info("Generating synthetic anomalies for the live stream processor...")
+    for _ in range(5000):
+        adata = generator._inject_anomaly_event()
+        s = SessionModel(
+            session_id=adata["session_id"],
+            identity_id=adata["identity_id"],
+            identity_name=adata["identity_name"],
+            peer_group=adata["peer_group"],
+            identity_type=adata["identity_type"],
+            start_time=datetime.datetime.fromisoformat(adata["start_time"]),
+            target_system=adata["target_system"],
+            privilege_level=adata["privilege_level"],
+            source_ip=adata["source_ip"],
+            actions=adata["actions"],
+            data_volume_mb=adata["data_volume_mb"],
+            login_hour=adata["login_hour"],
+            duration_minutes=adata["duration_minutes"],
+            is_anomalous=True,
+            anomaly_type=adata["anomaly_type"],
+        )
+        db_sessions.append(s)
+        
     logger.info("Saving to database...")
     async with AsyncSessionLocal() as db:
         # Clear existing sessions
